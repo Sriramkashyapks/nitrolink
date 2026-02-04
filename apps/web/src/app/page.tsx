@@ -5,11 +5,13 @@ import { useAccount, useEnsName, useEnsAvatar } from 'wagmi';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Loader2 } from 'lucide-react';
+import { ZapWidget } from '@/components/zap-widget';
 
 export default function Home() {
     const { address, isConnected } = useAccount();
 
-    // We force chainId: 1 (Mainnet) for ENS because Arc Testnet doesn't have ENS records.
+    // ENS names only exist on Ethereum mainnet, so we have to query chain 1
+    // even though our app primarily uses Arc Testnet
     const { data: ensName, isLoading: isEnsLoading } = useEnsName({
         address,
         chainId: 1
@@ -22,18 +24,34 @@ export default function Home() {
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 text-white p-6">
-            {/* Top right connect button */}
-            <div className="absolute top-6 right-6">
-                <ConnectKitButton />
-            </div>
+            {isConnected && (
+                <div className="absolute top-6 right-6 z-50">
+                    <ConnectKitButton />
+                </div>
+            )}
 
             <div className="z-10 w-full max-w-md items-center justify-between font-mono text-sm">
                 {!isConnected ? (
-                    <div className="text-center space-y-4">
-                        <h1 className="text-4xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
-                            NitroLink
-                        </h1>
-                        <p className="text-zinc-400">Connect wallet to view your identity.</p>
+                    <div className="text-center space-y-6">
+                        <div className="space-y-2">
+                            <h1 className="text-4xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                                NitroLink
+                            </h1>
+                            <p className="text-zinc-400">Connect wallet to view your identity.</p>
+                        </div>
+
+                        <ConnectKitButton.Custom>
+                            {({ show }) => {
+                                return (
+                                    <button
+                                        onClick={show}
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105"
+                                    >
+                                        Connect Wallet
+                                    </button>
+                                );
+                            }}
+                        </ConnectKitButton.Custom>
                     </div>
                 ) : (
                     <Card className="w-full bg-zinc-900 border-zinc-800 shadow-2xl">
@@ -67,8 +85,8 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            <div className="h-24 flex items-center justify-center border-2 border-dashed border-zinc-800 rounded-lg text-zinc-600">
-                                Zap & Stream Widgets Coming Soon...
+                            <div className="space-y-6">
+                                <ZapWidget />
                             </div>
                         </CardContent>
                     </Card>
