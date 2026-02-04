@@ -1,4 +1,4 @@
-# 💳 ENS PayCard
+# NITROLINK
 
 > **Your crypto payment link.** Shareable. Instant. Borderless.
 
