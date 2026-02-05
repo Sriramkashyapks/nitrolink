@@ -28,7 +28,7 @@ export function FlashStreamWidget() {
         socketRef.current = io('http://localhost:5001');
 
         socketRef.current.on('connect', () => {
-            console.log("✅ Connected to Yellow State Node:", socketRef.current?.id);
+            console.log("Connected to Yellow State Node:", socketRef.current?.id);
         });
 
         // LISTEN for updates from the backend
@@ -43,12 +43,14 @@ export function FlashStreamWidget() {
 
     const handleStartStream = async () => {
         if (!address) return toast.error("Connect Wallet first");
-        if (!recipient.includes('0x')) return toast.error("Invalid address");
+        const cleanRecipient = recipient.trim();
+        if (!cleanRecipient.includes('0x')) return toast.error("Invalid address");
 
         // TELL BACKEND TO START
         if (socketRef.current) {
             socketRef.current.emit('start_stream', {
-                recipient: recipient,
+                recipient: cleanRecipient,
+                sender: address,
                 rate: 0.0001 // Sending fixed rate for demo
             });
             setIsStreaming(true);
@@ -73,9 +75,10 @@ export function FlashStreamWidget() {
             const finalAmount = streamedAmount.toFixed(6); // Format correctly
             toast.loading("Settling on Base Sepolia...");
 
+            const cleanRecipient = recipient.trim();
             // A. Trigger Wallet Transaction
             const txHash = await sendTransactionAsync({
-                to: recipient as `0x${string}`,
+                to: cleanRecipient as `0x${string}`,
                 value: parseEther(finalAmount), // Convert USDC amount to Wei (mocking USDC as ETH for testnet simplicity)
             });
 
@@ -152,7 +155,7 @@ export function FlashStreamWidget() {
                         <Input
                             placeholder="Recipient (0x...)"
                             value={recipient}
-                            onChange={(e) => setRecipient(e.target.value)}
+                            onChange={(e) => setRecipient(e.target.value.trim())}
                             disabled={isStreaming}
                             error={!recipient.includes('0x')}
                             className="bg-zinc-950 border-zinc-800 focus:ring-yellow-500/50 text-white"

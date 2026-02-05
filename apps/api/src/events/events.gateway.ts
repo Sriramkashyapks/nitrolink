@@ -6,14 +6,8 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-
-interface StreamSession {
-    recipient: string;
-    rate: number; // USDC per second
-    balance: number;
-    intervalId: any;
-    startTime: number;
-}
+import { EventsService, StreamSession } from './events.service';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
     cors: {
@@ -23,27 +17,27 @@ interface StreamSession {
 export class EventsGateway {
     @WebSocketServer()
     server: Server;
+    private readonly logger = new Logger(EventsGateway.name);
 
-    // In-memory "State Channel" storage
-    // In production, this would be a Redis DB
-    private activeStreams = new Map<string, StreamSession>();
+    constructor(private eventsService: EventsService) { }
 
     @SubscribeMessage('start_stream')
     handleStartStream(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { recipient: string; rate: number },
+        @MessageBody() data: { recipient: string; rate: number; sender?: string },
     ) {
         const clientId = client.id;
 
         // 1. Check if stream already exists
-        if (this.activeStreams.has(clientId)) {
+        if (this.eventsService.hasStream(clientId)) {
             return { status: 'error', message: 'Stream already active' };
         }
 
-        console.log(`⚡ Opening Yellow State Channel for ${clientId} -> ${data.recipient}`);
+        this.logger.log(`Opening Yellow State Channel for ${clientId} (${data.sender || 'unknown'}) -> ${data.recipient}`);
 
         // 2. Create the Session
         const session: StreamSession = {
+            sender: data.sender,
             recipient: data.recipient,
             rate: data.rate || 0.0001, // Default rate if none provided
             balance: 0,
@@ -52,7 +46,6 @@ export class EventsGateway {
         };
 
         // 3. Start the High-Frequency Ticker (The "Stream")
-        // This simulates the off-chain state updates
         session.intervalId = setInterval(() => {
             session.balance += session.rate;
 
@@ -65,7 +58,7 @@ export class EventsGateway {
         }, 1000); // Update every second
 
         // 4. Save Session
-        this.activeStreams.set(clientId, session);
+        this.eventsService.setStream(clientId, session);
 
         return { status: 'success', message: 'Channel Opened' };
     }
@@ -73,13 +66,13 @@ export class EventsGateway {
     @SubscribeMessage('stop_stream')
     handleStopStream(@ConnectedSocket() client: Socket) {
         const clientId = client.id;
-        const session = this.activeStreams.get(clientId);
+        const session = this.eventsService.getStream(clientId);
 
         if (!session) {
             return { status: 'error', message: 'No active stream found' };
         }
 
-        console.log(`🛑 Closing Channel. Final Balance: ${session.balance}`);
+        this.logger.log(`Closing Channel. Final Balance: ${session.balance}`);
 
         // 1. Stop the Timer
         clearInterval(session.intervalId);
@@ -88,7 +81,7 @@ export class EventsGateway {
         const finalBalance = session.balance;
 
         // 3. Destroy Session
-        this.activeStreams.delete(clientId);
+        this.eventsService.deleteStream(clientId);
 
         // 4. Return Final State for Settlement
         return {
@@ -100,11 +93,11 @@ export class EventsGateway {
 
     // Cleanup if user disconnects abruptly
     handleDisconnect(client: Socket) {
-        if (this.activeStreams.has(client.id)) {
-            const session = this.activeStreams.get(client.id);
-            clearInterval(session?.intervalId);
-            this.activeStreams.delete(client.id);
-            console.log(`Client ${client.id} disconnected. Stream killed.`);
+        const session = this.eventsService.getStream(client.id);
+        if (session) {
+            clearInterval(session.intervalId);
+            this.eventsService.deleteStream(client.id);
+            this.logger.log(`Client ${client.id} disconnected. Stream killed.`);
         }
     }
 }

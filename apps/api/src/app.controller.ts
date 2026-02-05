@@ -3,12 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { Transaction } from './schemas/transaction.schema';
+import { EventsService } from './events/events.service';
 
 @Controller()
 export class AppController {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Transaction.name) private txModel: Model<Transaction>,
+    private eventsService: EventsService,
   ) { }
 
   // 1. Login User
@@ -37,5 +39,15 @@ export class AppController {
   @Get('leaderboard')
   async getLeaderboard() {
     return this.userModel.find().sort({ totalReceived: -1 }).limit(10);
+  }
+
+  // 5. Get Active Stream Details
+  @Get('stream')
+  async getStream(@Query('address') address?: string) {
+    if (address) {
+      const stream = this.eventsService.getStreamBySender(address);
+      return stream || { status: 'no_active_stream' };
+    }
+    return this.eventsService.getAllStreams();
   }
 }
