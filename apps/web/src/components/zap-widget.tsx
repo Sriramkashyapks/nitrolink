@@ -71,7 +71,6 @@ export function ZapWidget() {
                 usedCrossChain = true;
             } catch (apiError: any) {
                 console.error("❌ LiFi API Error:", apiError.message);
-                toast.info("Falling back to simple ETH transfer to recipient");
                 quote = null;
             }
 
