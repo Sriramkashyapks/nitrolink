@@ -4,8 +4,6 @@ import { type State, WagmiProvider } from 'wagmi';
 import { ConnectKitProvider } from 'connectkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from '@/lib/config';
-import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
 
 // Create a new client for React Query. This handles caching and updating data.
 function makeQueryClient() {
@@ -40,42 +38,14 @@ function getQueryClient() {
   }
 }
 
-// Inner component to handle disconnect cleanup
-function DisconnectHandler({ queryClient }: { queryClient: QueryClient }) {
-  const { isConnected, isDisconnected } = useAccount();
-
-  useEffect(() => {
-    if (isDisconnected) {
-      // Clear all queries when wallet disconnects
-      queryClient.clear();
-
-      // Clear any stored wallet state
-      if (typeof window !== 'undefined') {
-        // Clear localStorage items related to wallet connections
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && (key.includes('wagmi') || key.includes('walletconnect') || key.includes('connectkit'))) {
-            keysToRemove.push(key);
-          }
-        }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
-      }
-    }
-  }, [isDisconnected, queryClient]);
-
-  return null;
-}
-
 export function Providers({ children, initialState }: { children: React.ReactNode, initialState?: State }) {
   const queryClient = getQueryClient();
 
   return (
-    <WagmiProvider config={config} reconnectOnMount={false}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         {/* ConnectKit gives us the pre-built "Connect Wallet" modal */}
         <ConnectKitProvider mode="dark">
-          <DisconnectHandler queryClient={queryClient} />
           {children}
         </ConnectKitProvider>
       </QueryClientProvider>

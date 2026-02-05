@@ -18,8 +18,6 @@ export function RecentTransactions() {
             return res.json();
         },
         enabled: !!address,
-        // Refetch every 3 seconds to get new transactions
-        refetchInterval: 3000,
         // Refetch when component mounts
         refetchOnMount: true,
         // Refetch when window regains focus

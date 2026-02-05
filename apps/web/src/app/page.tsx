@@ -8,6 +8,16 @@ import { RecentTransactions } from '@/components/recent-transactions';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { LayoutDashboard, Zap, Radio } from 'lucide-react';
 
+// Helper to force correct network names based on ID
+const getNetworkName = (chain: any) => {
+    const id = chain?.id;
+    if (id === 11155111) return "Sepolia";          // Ethereum Sepolia
+    if (id === 84532) return "Base Sepolia";        // Base Sepolia
+    if (id === 421614) return "Arbitrum Sepolia";   // Arbitrum Sepolia
+    if (id === 5115) return "Citrea Testnet";       // Example if used
+    return chain?.name || "Unknown Network";        // Fallback
+};
+
 export default function Home() {
     const { address, isConnected, chain } = useAccount();
     const { data: ensName } = useEnsName({ address, chainId: 1 });
@@ -131,10 +141,11 @@ export default function Home() {
                                                 <span className="text-emerald-400 text-sm font-bold">Active</span>
                                             </div>
                                         </div>
-                                        <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800 flex flex-col items-center justify-center">
-                                            <span className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Network</span>
-                                            <span className="text-blue-400 text-sm font-bold truncate max-w-full px-2">
-                                                {chain?.name || 'Sepolia'}
+                                        <div className="flex items-center gap-2 bg-zinc-900/50 rounded-full px-3 py-1 border border-zinc-800">
+                                            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                                            <span className="text-xs font-medium text-zinc-300">
+                                                {/* CALL THE FUNCTION HERE */}
+                                                {isConnected ? getNetworkName(chain) : 'Not Connected'}
                                             </span>
                                         </div>
                                     </div>

@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { useWalletClient, useAccount } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 import { getQuote, executeRoute } from '@lifi/sdk';
+import { parseEther } from 'viem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowRight, Wallet } from 'lucide-react';
+import { Loader2, ArrowRight, Wallet, Zap } from 'lucide-react';
 import Confetti from 'react-confetti';
 import useSound from 'use-sound';
 import { toast } from 'sonner';
@@ -17,8 +18,8 @@ import { toast } from 'sonner';
 const ZAP_CONFIG = {
     fromChain: 11155111, // Ethereum Sepolia (Source)
     fromToken: '0x0000000000000000000000000000000000000000', // Native ETH
-    toChain: 421614, // Arbitrum Sepolia (Destination)
-    toToken: '0x75faf114eafb1BDbe2F031385358e1eE48e548bd', // USDC on Arb Sepolia
+    toChain: 84532, // Base Sepolia (Destination)
+    toToken: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // USDC on Base Sepolia
 };
 
 export function ZapWidget() {
@@ -27,6 +28,7 @@ export function ZapWidget() {
     const queryClient = useQueryClient();
 
     const [amount, setAmount] = useState('0.01');
+    const [recipientAddress, setRecipientAddress] = useState('0x1a1A744bc556300d7D42475D0c21C737c02C9A74');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('');
     const [showConfetti, setShowConfetti] = useState(false);
@@ -39,14 +41,22 @@ export function ZapWidget() {
             return;
         }
 
+        if (!recipientAddress || !recipientAddress.startsWith('0x')) {
+            toast.error("Please enter a valid recipient address");
+            return;
+        }
+
         setLoading(true);
         setStatus('Finding best route...');
 
         try {
-            // PHASE 1: Try Real Quote
+            // PHASE 1: Try Real Cross-Chain Quote
             let quote;
+            let usedCrossChain = false;
+
             try {
-                console.log("Attempting Real Quote...");
+                console.log("🔍 Attempting LiFi Cross-Chain Quote...");
+
                 quote = await getQuote({
                     fromChain: ZAP_CONFIG.fromChain,
                     fromToken: ZAP_CONFIG.fromToken,
@@ -54,44 +64,37 @@ export function ZapWidget() {
                     fromAmount: (Number(amount) * 10 ** 18).toString(),
                     toChain: ZAP_CONFIG.toChain,
                     toToken: ZAP_CONFIG.toToken,
-                    toAddress: address,
+                    toAddress: recipientAddress, // Use the recipient address here!
                 });
-                console.log("Quote received!", quote);
-            } catch (apiError) {
-                console.warn("API Error (Switching to Simulation):", apiError);
+
+                console.log("✅ Quote received!", quote);
+                usedCrossChain = true;
+            } catch (apiError: any) {
+                console.error("❌ LiFi API Error:", apiError.message);
+                toast.info("Falling back to simple ETH transfer to recipient");
                 quote = null;
             }
 
-            let txHash = '0xTestnetSimulationHash';
+            let txHash = '0xPendingTransaction';
 
-            // PHASE 2: Execute
-            if (quote) {
-                // Option A: REAL TRANSACTION
-                setStatus('Please confirm gas fee in wallet...');
+            // PHASE 2: Execute Transaction
+            if (quote && usedCrossChain) {
+                console.log("🚀 Executing cross-chain route...");
+                setStatus('Please confirm transaction in wallet...');
                 const tx = await executeRoute(signer as any, quote as any);
                 txHash = tx.steps[0]?.execution?.process[0]?.txHash || txHash;
             } else {
-                // Option B: DEMO SIMULATION (Fallback)
-                console.log("⚠️ Running Demo Simulation...");
+                console.log("💸 Executing simple ETH transfer...");
+                setStatus('Please confirm transfer in wallet...');
 
-                // 1. Simulate "Finding Route"
-                await new Promise(resolve => setTimeout(resolve, 800));
-
-                // 2. Simulate "Signing" (User signs a dummy message)
-                setStatus('Please Sign Demo Authorization...');
-                if (signer) {
-                    await signer.signMessage({
-                        message: `Authorize NitroLink Zap: ${amount} ETH -> USDC`
-                    });
-                }
-
-                // 3. Simulate "Bridging"
-                setStatus('Bridging Assets...');
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                txHash = await signer.sendTransaction({
+                    to: recipientAddress as `0x${string}`, // Use the recipient address here!
+                    value: parseEther(amount),
+                });
             }
 
             // PHASE 3: Success & Save
-            setStatus('Zap Complete! 🎉');
+            setStatus('Transaction Complete! 🎉');
             playCash();
             setShowConfetti(true);
 
@@ -101,18 +104,16 @@ export function ZapWidget() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userAddress: address,
+                    recipientAddress: recipientAddress,
                     type: 'Zap',
-                    asset: 'USDC',
-                    amount: (Number(amount) * 2800).toFixed(2),
+                    asset: 'ETH',
+                    amount: amount,
                     txHash: txHash,
                     status: 'Success'
                 })
             });
 
-            // Immediately refetch transactions to update the table
             queryClient.invalidateQueries({ queryKey: ['transactions', address] });
-
-            // Hide confetti and reset status after 5 seconds
             setTimeout(() => {
                 setShowConfetti(false);
                 setStatus('');
@@ -120,11 +121,7 @@ export function ZapWidget() {
 
         } catch (error: any) {
             console.error("Zap failed:", error);
-            if (error.message?.includes('User rejected')) {
-                toast.error("Transaction cancelled");
-            } else {
-                toast.error("Zap failed");
-            }
+            toast.error(error.message?.includes('User rejected') ? "Transaction cancelled" : "Zap failed");
         } finally {
             setLoading(false);
         }
@@ -136,28 +133,40 @@ export function ZapWidget() {
 
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
-                    <Wallet className="h-5 w-5" />
+                    <Zap className="h-5 w-5 fill-emerald-400" />
                     Rapid Zap
                 </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-4">
+                {/* 1. Recipient Field (New) */}
+                <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
+                    <Input
+                        value={recipientAddress}
+                        onChange={(e) => setRecipientAddress(e.target.value)}
+                        placeholder="0x..."
+                        className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
+                    />
+                </div>
+
+                {/* 2. Amount Field */}
                 <div className="flex items-center gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800">
                     <div className="flex-1">
-                        <p className="text-xs text-zinc-500 mb-1">Send (Sepolia)</p>
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Pay (Sepolia)</p>
                         <div className="flex items-center gap-2">
                             <Input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="bg-transparent border-none text-xl p-0 h-auto focus-visible:ring-0 text-white"
+                                className="bg-transparent border-none text-xl p-0 h-auto focus-visible:ring-0 text-white font-bold"
                             />
                             <span className="font-bold text-zinc-400">ETH</span>
                         </div>
                     </div>
                     <ArrowRight className="text-zinc-600" />
                     <div className="flex-1 text-right">
-                        <p className="text-xs text-zinc-500 mb-1">Receive (Arb Sepolia)</p>
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Receive (Cross-Chain)</p>
                         <div className="flex items-center justify-end gap-2">
                             <span className="text-xl font-bold text-white">
                                 ~{(Number(amount) * 2800).toFixed(2)}
@@ -170,7 +179,7 @@ export function ZapWidget() {
                 <Button
                     onClick={handleZap}
                     disabled={loading || !amount || Number(amount) <= 0}
-                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12 text-lg"
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12 text-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
                 >
                     {loading ? (
                         <span className="flex items-center gap-2">
