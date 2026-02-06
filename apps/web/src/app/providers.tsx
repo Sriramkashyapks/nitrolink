@@ -5,6 +5,8 @@ import { ConnectKitProvider } from 'connectkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from '@/lib/config';
 
+import { Toaster } from 'sonner';
+
 // Create a new client for React Query. This handles caching and updating data.
 function makeQueryClient() {
   return new QueryClient({
@@ -46,6 +48,7 @@ export function Providers({ children, initialState }: { children: React.ReactNod
       <QueryClientProvider client={queryClient}>
         {/* ConnectKit gives us the pre-built "Connect Wallet" modal */}
         <ConnectKitProvider mode="dark">
+          <Toaster position="bottom-right" richColors />
           {children}
         </ConnectKitProvider>
       </QueryClientProvider>

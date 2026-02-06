@@ -41,7 +41,8 @@ export function ZapWidget() {
             return;
         }
 
-        if (!recipientAddress || !recipientAddress.startsWith('0x')) {
+        const cleanRecipient = recipientAddress.trim();
+        if (!cleanRecipient || !cleanRecipient.startsWith('0x')) {
             toast.error("Please enter a valid recipient address");
             return;
         }
@@ -55,8 +56,6 @@ export function ZapWidget() {
             let usedCrossChain = false;
 
             try {
-                console.log("🔍 Attempting LiFi Cross-Chain Quote...");
-
                 quote = await getQuote({
                     fromChain: ZAP_CONFIG.fromChain,
                     fromToken: ZAP_CONFIG.fromToken,
@@ -64,14 +63,12 @@ export function ZapWidget() {
                     fromAmount: (Number(amount) * 10 ** 18).toString(),
                     toChain: ZAP_CONFIG.toChain,
                     toToken: ZAP_CONFIG.toToken,
-                    toAddress: recipientAddress, // Use the recipient address here!
+                    toAddress: cleanRecipient, // Use the recipient address here!
                 });
 
-                console.log("✅ Quote received!", quote);
                 usedCrossChain = true;
             } catch (apiError: any) {
                 console.error("❌ LiFi API Error:", apiError.message);
-                toast.info("Falling back to simple ETH transfer to recipient");
                 quote = null;
             }
 
@@ -79,16 +76,14 @@ export function ZapWidget() {
 
             // PHASE 2: Execute Transaction
             if (quote && usedCrossChain) {
-                console.log("🚀 Executing cross-chain route...");
                 setStatus('Please confirm transaction in wallet...');
                 const tx = await executeRoute(signer as any, quote as any);
                 txHash = tx.steps[0]?.execution?.process[0]?.txHash || txHash;
             } else {
-                console.log("💸 Executing simple ETH transfer...");
                 setStatus('Please confirm transfer in wallet...');
 
                 txHash = await signer.sendTransaction({
-                    to: recipientAddress as `0x${string}`, // Use the recipient address here!
+                    to: cleanRecipient as `0x${string}`, // Use the recipient address here!
                     value: parseEther(amount),
                 });
             }
@@ -104,7 +99,7 @@ export function ZapWidget() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userAddress: address,
-                    recipientAddress: recipientAddress,
+                    recipientAddress: cleanRecipient,
                     type: 'Zap',
                     asset: 'ETH',
                     amount: amount,
@@ -144,7 +139,7 @@ export function ZapWidget() {
                     <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
                     <Input
                         value={recipientAddress}
-                        onChange={(e) => setRecipientAddress(e.target.value)}
+                        onChange={(e) => setRecipientAddress(e.target.value.trim())}
                         placeholder="0x..."
                         className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
                     />

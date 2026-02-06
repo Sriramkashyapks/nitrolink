@@ -5,6 +5,8 @@ import { User, UserSchema } from './schemas/user.schema';
 import { Transaction, TransactionSchema } from './schemas/transaction.schema';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { EventsGateway } from './events/events.gateway';
+import { EventsService } from './events/events.service';
 
 @Module({
     imports: [
@@ -16,6 +18,6 @@ import { AppService } from './app.service';
         ])
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService, EventsGateway, EventsService],
 })
 export class AppModule { }
