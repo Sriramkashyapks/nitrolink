@@ -41,8 +41,8 @@ export const config = createConfig(
 
         // Optional App Info
         appDescription: "Instant crypto streaming and cross-chain settlements",
-        appUrl: "https://family.co",
-        appIcon: "https://family.co/logo.png",
+        appUrl: "http://localhost:3000", // Updated for development
+        appIcon: "https://i.imgur.com/placeholder.png", // Updated to avoid conflicts
     }),
 );
 

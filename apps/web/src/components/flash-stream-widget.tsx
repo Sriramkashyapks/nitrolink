@@ -6,9 +6,10 @@ import { parseEther } from 'viem'; // Added for Settlement
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Zap, Play, Square, Banknote, Clock, Loader2 } from 'lucide-react'; // Added Loader2
+import { Zap, Play, Square, Banknote, Clock, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
+import { useENSResolution } from '@/hooks/useENS';
 
 export function FlashStreamWidget() {
     const { address } = useAccount();
@@ -21,6 +22,10 @@ export function FlashStreamWidget() {
 
     // Ref to hold the socket connection so it persists across renders
     const socketRef = useRef<Socket | null>(null);
+
+    // ENS Resolution for recipient
+    const { address: resolvedENSAddress, isLoading: isResolvingENS, isENS } = useENSResolution(recipient);
+    const finalRecipientAddress = isENS && resolvedENSAddress ? resolvedENSAddress : recipient;
 
     // 1. Initialize Socket Connection
     useEffect(() => {
@@ -43,13 +48,22 @@ export function FlashStreamWidget() {
 
     const handleStartStream = async () => {
         if (!address) return toast.error("Connect Wallet first");
-        const cleanRecipient = recipient.trim();
-        if (!cleanRecipient.includes('0x')) return toast.error("Invalid address");
+
+        // Validate recipient - either valid address or resolved ENS
+        if (!finalRecipientAddress || !finalRecipientAddress.startsWith('0x')) {
+            if (isENS && isResolvingENS) {
+                return toast.error("Still resolving ENS name...");
+            } else if (isENS && !resolvedENSAddress) {
+                return toast.error("Could not resolve ENS name");
+            } else {
+                return toast.error("Please enter a valid address or ENS name");
+            }
+        }
 
         // TELL BACKEND TO START
         if (socketRef.current) {
             socketRef.current.emit('start_stream', {
-                recipient: cleanRecipient,
+                recipient: finalRecipientAddress, // Use resolved ENS address!
                 sender: address,
                 rate: 0.0001 // Sending fixed rate for demo
             });
@@ -75,10 +89,9 @@ export function FlashStreamWidget() {
             const finalAmount = streamedAmount.toFixed(6); // Format correctly
             toast.loading("Settling on Base Sepolia...");
 
-            const cleanRecipient = recipient.trim();
             // A. Trigger Wallet Transaction
             const txHash = await sendTransactionAsync({
-                to: cleanRecipient as `0x${string}`,
+                to: finalRecipientAddress as `0x${string}`, // Use resolved ENS address!
                 value: parseEther(finalAmount), // Convert USDC amount to Wei (mocking USDC as ETH for testnet simplicity)
             });
 
@@ -88,6 +101,7 @@ export function FlashStreamWidget() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userAddress: address,
+                    recipientAddress: finalRecipientAddress, // Save resolved address!
                     type: 'Stream Settlement',
                     asset: 'USDC',
                     amount: finalAmount,
@@ -151,15 +165,34 @@ export function FlashStreamWidget() {
 
                 {/* CONTROLS */}
                 <div className="space-y-4">
-                    <div>
-                        <Input
-                            placeholder="Recipient (0x...)"
-                            value={recipient}
-                            onChange={(e) => setRecipient(e.target.value.trim())}
-                            disabled={isStreaming}
-                            error={!recipient.includes('0x')}
-                            className="bg-zinc-950 border-zinc-800 focus:ring-yellow-500/50 text-white"
-                        />
+                    <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
+                            Recipient (Address or ENS)
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                placeholder="0x... or vitalik.eth"
+                                value={recipient}
+                                onChange={(e) => setRecipient(e.target.value.trim())}
+                                disabled={isStreaming}
+                                className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-yellow-400 font-mono flex-1"
+                            />
+                            {isResolvingENS && (
+                                <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                            )}
+                            {isENS && !isResolvingENS && resolvedENSAddress && (
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            )}
+                            {isENS && !isResolvingENS && !resolvedENSAddress && recipient && (
+                                <AlertCircle className="h-4 w-4 text-red-500" />
+                            )}
+                        </div>
+                        {/* Show resolved address below ENS name */}
+                        {isENS && resolvedENSAddress && (
+                            <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                                → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
