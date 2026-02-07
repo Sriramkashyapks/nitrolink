@@ -27,7 +27,7 @@ export function FlashStreamWidget() {
     const { address: resolvedENSAddress, isLoading: isResolvingENS, isENS } = useENSResolution(recipient);
     const finalRecipientAddress = isENS && resolvedENSAddress ? resolvedENSAddress : recipient;
 
-    // 1. Initialize Socket Connection
+    // 1. Initialize Socket Connectionrecipient
     useEffect(() => {
         // Connect to your NestJS Backend
         socketRef.current = io('http://localhost:5001');
