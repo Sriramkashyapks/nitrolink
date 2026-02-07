@@ -7,6 +7,7 @@ import { Activity, Loader2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
 import { columns, Transaction } from './columns';
 import { useEffect, useRef } from 'react';
+import { apiUrl } from '@/lib/config';
 
 interface TransactionResponse {
     transactions: Transaction[];
@@ -29,7 +30,7 @@ export function RecentTransactions() {
         queryFn: async ({ pageParam = 0 }) => {
             if (!address) return { transactions: [], total: 0, hasMore: false };
             const res = await fetch(
-                `http://localhost:5001/transactions?address=${address}&limit=5&skip=${pageParam}`
+                `${apiUrl}/transactions?address=${address}&limit=5&skip=${pageParam}`
             );
             return res.json();
         },

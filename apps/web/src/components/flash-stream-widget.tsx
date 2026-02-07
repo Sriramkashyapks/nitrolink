@@ -10,6 +10,7 @@ import { Zap, Play, Square, Banknote, Clock, Loader2, CheckCircle2, AlertCircle 
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
 import { useENSResolution } from '@/hooks/useENS';
+import { apiUrl } from '@/lib/config';
 
 export function FlashStreamWidget() {
     const { address } = useAccount();
@@ -30,7 +31,7 @@ export function FlashStreamWidget() {
     // 1. Initialize Socket Connectionrecipient
     useEffect(() => {
         // Connect to your NestJS Backend
-        socketRef.current = io('http://localhost:5001');
+        socketRef.current = io(apiUrl);
 
         socketRef.current.on('connect', () => {
             console.log("Connected to Yellow State Node:", socketRef.current?.id);
@@ -96,7 +97,7 @@ export function FlashStreamWidget() {
             });
 
             // B. Save to DB (Optional but good for history)
-            await fetch('http://localhost:5001/transaction', {
+            await fetch(`${apiUrl}/transaction`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
