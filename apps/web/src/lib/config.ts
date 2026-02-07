@@ -33,7 +33,7 @@ export const config = createConfig(
             [baseSepolia.id]: http(),
             [arbitrumSepolia.id]: http(),
             [arcTestnet.id]: http(),
-            [mainnet.id]: http(),
+            [mainnet.id]: http("https://eth.llamarpc.com"),
         },
 
         // Required API Keys
