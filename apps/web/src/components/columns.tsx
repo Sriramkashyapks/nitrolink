@@ -22,7 +22,9 @@ export const columns: ColumnDef<Transaction>[] = [
         accessorKey: "type",
         header: "Type",
         cell: ({ row }) => {
-            const type = row.getValue("type") as string
+            if (!row?.original) return null;
+            const type = row.getValue("type") as string;
+            if (!type) return null;
             return (
                 <div className="font-medium flex items-center gap-2">
                     {type === 'Zap' ? (

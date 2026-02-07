@@ -131,7 +131,7 @@ export function FlashStreamWidget() {
         <Card className="h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden group flex flex-col">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-yellow-500/10 blur-[50px] rounded-full group-hover:bg-yellow-500/20 transition-all duration-700 pointer-events-none" />
 
-            <CardHeader>
+            <CardHeader className="border-b border-zinc-800/50">
                 <CardTitle className="flex items-center gap-2 text-yellow-400">
                     <Zap className="h-5 w-5 fill-yellow-400" />
                     Flash Stream
@@ -162,6 +162,9 @@ export function FlashStreamWidget() {
                         )}
                     </div>
                 </div>
+
+                {/* Divider line */}
+                <div className="h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent"></div>
 
                 {/* CONTROLS */}
                 <div className="space-y-4">

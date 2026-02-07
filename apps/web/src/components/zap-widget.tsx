@@ -139,7 +139,7 @@ export function ZapWidget() {
         <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden flex flex-col">
             {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
 
-            <CardHeader>
+            <CardHeader className="border-b border-zinc-800/50">
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                     <Zap className="h-5 w-5 fill-emerald-400" />
                     Rapid Zap
@@ -172,6 +172,9 @@ export function ZapWidget() {
                         </div>
                     </div>
                 </div>
+
+                {/* Divider line */}
+                <div className="h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent"></div>
 
                 {/* CONTROLS container to match Flash Stream layout */}
                 <div className="space-y-4">
