@@ -33,6 +33,7 @@ export default function Home() {
             {/* 1. TOP NAVIGATION BAR */}
             <header className="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
                 <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+                    {/* LEFT: Logo */}
                     <div className="flex items-center gap-2">
                         <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
                             <Zap className="h-5 w-5 text-black fill-black" />
@@ -42,11 +43,35 @@ export default function Home() {
                         </span>
                     </div>
 
+                    {/* CENTER: Identity Hub (Only if Connected) */}
                     {isConnected && (
-                        <div className="flex items-center gap-4">
-                            <ConnectKitButton />
+                        <div className="hidden md:flex items-center gap-6 bg-zinc-900/50 border border-zinc-800/50 rounded-full px-4 py-1.5 backdrop-blur-md">
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <Avatar className="h-8 w-8 ring-2 ring-emerald-500/20">
+                                        <AvatarImage src={ensAvatar || ''} />
+                                        <AvatarFallback className="bg-zinc-800 text-zinc-400 text-xs font-bold">
+                                            {address?.slice(2, 4).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-zinc-950 animate-pulse" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-white leading-none">
+                                        {ensName || `${address?.slice(0, 6)}...${address?.slice(-4)}`}
+                                    </span>
+                                    <span className="text-[10px] text-zinc-500 font-mono">
+                                        {getNetworkName(chain)}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     )}
+
+                    {/* RIGHT: Wallet Button */}
+                    <div className="flex items-center gap-4">
+                        <ConnectKitButton />
+                    </div>
                 </div>
             </header>
 
@@ -80,10 +105,10 @@ export default function Home() {
                     </div>
                 ) : (
                     /* STATE B: CONNECTED (Dashboard) */
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500 items-start">
+                    <div className="flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto">
 
-                        {/* LEFT COLUMN - ACTION CENTER */}
-                        <div className="lg:col-span-8 flex flex-col gap-8">
+                        {/* ROW 1: WIDGETS (Side-by-Side) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                             {/* Main Zap Widget */}
                             <div className="relative group">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
@@ -101,56 +126,14 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN - DATA CENTER */}
-                        <div className="lg:col-span-4 flex flex-col gap-8 sticky top-24">
-                            {/* Identity Card */}
-                            <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm overflow-hidden">
-                                <CardHeader className="pb-3 border-b border-zinc-800/50">
-                                    <CardTitle className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <LayoutDashboard className="h-3 w-3" /> Identity Hub
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-6">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="relative">
-                                            <Avatar className="h-16 w-16 ring-2 ring-emerald-500/20 shadow-xl">
-                                                <AvatarImage src={ensAvatar || ''} />
-                                                <AvatarFallback className="bg-zinc-800 text-zinc-400 font-bold text-lg">
-                                                    {address?.slice(2, 4).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-zinc-950 rounded-full border border-zinc-800 flex items-center justify-center">
-                                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-white leading-none mb-1.5">
-                                                {ensName || "Anonymous User"}
-                                            </h3>
-                                            <p className="text-[10px] text-zinc-500 font-mono bg-zinc-950 px-2 py-1 rounded border border-zinc-800 inline-block tracking-tight">
-                                                {address?.slice(0, 8)}...{address?.slice(-6)}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-zinc-950/50 p-3 rounded-xl border border-zinc-800/50 flex flex-col items-center justify-center group hover:border-emerald-500/30 transition-colors">
-                                            <span className="text-[9px] text-zinc-500 uppercase tracking-widest mb-1.5 font-bold">Status</span>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="text-emerald-400 text-xs font-black uppercase tracking-tighter">Active</span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-zinc-950/50 p-3 rounded-xl border border-zinc-800/50 flex flex-col items-center justify-center group hover:border-blue-500/30 transition-colors">
-                                            <span className="text-[9px] text-zinc-500 uppercase tracking-widest mb-1.5 font-bold">Network</span>
-                                            <span className="text-blue-400 text-[11px] font-bold truncate max-w-full">
-                                                {isConnected ? getNetworkName(chain) : 'Disconnected'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Recent Activity */}
+                        {/* ROW 2: RECENT ACTIVITY */}
+                        <div className="border-t border-zinc-800/50 pt-8">
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                <LayoutDashboard className="h-5 w-5 text-zinc-500" />
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400">
+                                    Recent Activity
+                                </span>
+                            </h2>
                             <RecentTransactions />
                         </div>
 

@@ -14,6 +14,7 @@ export type Transaction = {
     createdAt: string
     userAddress: string
     recipientAddress?: string  // Optional for backward compatibility
+    txHash: string
 }
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -76,4 +77,12 @@ export const columns: ColumnDef<Transaction>[] = [
             return <div className="text-right font-mono text-emerald-400 font-bold">+{formatted}</div>
         },
     },
+    {
+        accessorKey: "txHash",
+        header: "Transaction Hash",
+        cell: ({ row }) => {
+            const txHash = row.getValue("txHash") as string
+            return <div className="text-zinc-300 font-mono text-xs">{txHash}</div>
+        }
+    }
 ]

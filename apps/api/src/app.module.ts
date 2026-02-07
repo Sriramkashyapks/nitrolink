@@ -14,7 +14,7 @@ import { EventsService } from './events/events.service';
         MongooseModule.forRoot(process.env.MONGO_URI || ''),
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
-            { name: Transaction.name, schema: TransactionSchema }, // Added this line
+            { name: Transaction.name, schema: TransactionSchema },
         ])
     ],
     controllers: [AppController],
