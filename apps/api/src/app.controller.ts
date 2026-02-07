@@ -31,8 +31,27 @@ export class AppController {
 
   // 3. Get History (Call this for the Table)
   @Get('transactions')
-  async getTransactions(@Query('address') address: string) {
-    return this.txModel.find({ userAddress: address }).sort({ createdAt: -1 });
+  async getTransactions(
+    @Query('address') address: string,
+    @Query('limit') limit?: string,
+    @Query('skip') skip?: string,
+  ) {
+    const limitNum = limit ? parseInt(limit, 10) : 5;
+    const skipNum = skip ? parseInt(skip, 10) : 0;
+
+    const [transactions, total] = await Promise.all([
+      this.txModel.find({ userAddress: address })
+        .sort({ createdAt: -1 })
+        .limit(limitNum)
+        .skip(skipNum),
+      this.txModel.countDocuments({ userAddress: address })
+    ]);
+
+    return {
+      transactions,
+      total,
+      hasMore: skipNum + limitNum < total
+    };
   }
 
   // 4. Leaderboard
