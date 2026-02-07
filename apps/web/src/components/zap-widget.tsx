@@ -13,6 +13,7 @@ import Confetti from 'react-confetti';
 import useSound from 'use-sound';
 import { toast } from 'sonner';
 import { useENSResolution } from '@/hooks/useENS';
+import { apiUrl } from '@/lib/config';
 
 // REAL CONFIG: Ethereum Sepolia -> Arbitrum Sepolia
 // We move money FROM where you have it (Sepolia)
@@ -107,7 +108,7 @@ export function ZapWidget() {
             setShowConfetti(true);
 
             // Save Transaction to DB
-            await fetch('http://localhost:5001/transaction', {
+            await fetch(`${apiUrl}/transaction`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -21,6 +21,9 @@ export const arcTestnet = defineChain({
     testnet: true,
 });
 
+// API URL configuration for backend calls
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+
 export const config = createConfig(
     getDefaultConfig({
         // Your chains - Sepolia is now first to match user's wallet
@@ -30,7 +33,7 @@ export const config = createConfig(
             [baseSepolia.id]: http(),
             [arbitrumSepolia.id]: http(),
             [arcTestnet.id]: http(),
-            [mainnet.id]: http(),
+            [mainnet.id]: http("https://eth.llamarpc.com"),
         },
 
         // Required API Keys
