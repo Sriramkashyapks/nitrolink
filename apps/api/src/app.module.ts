@@ -11,7 +11,7 @@ import { EventsService } from './events/events.service';
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.MONGO_URI || ''),
+        MongooseModule.forRoot(process.env.MONGODB_URI || ''),
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
             { name: Transaction.name, schema: TransactionSchema },
