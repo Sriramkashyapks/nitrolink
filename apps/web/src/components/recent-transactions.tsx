@@ -43,8 +43,8 @@ export function RecentTransactions() {
         initialPageParam: 0,
     });
 
-    // Flatten all pages into a single array
-    const transactions = data?.pages.flatMap((page) => page.transactions) ?? [];
+    // Flatten all pages into a single array and filter out any invalid entries
+    const transactions = (data?.pages.flatMap((page) => page.transactions) ?? []).filter(Boolean);
 
     // Intersection Observer for infinite scroll
     useEffect(() => {

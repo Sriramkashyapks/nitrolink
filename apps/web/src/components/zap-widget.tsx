@@ -136,86 +136,92 @@ export function ZapWidget() {
     };
 
     return (
-        <Card className="w-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden">
+        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden flex flex-col">
             {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
 
-            <CardHeader>
+            <CardHeader className="border-b border-zinc-800/50">
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                     <Zap className="h-5 w-5 fill-emerald-400" />
                     Rapid Zap
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4">
-                {/* 1. Recipient Field with ENS Support */}
-                <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
-                        Recipient (Address or ENS)
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            value={recipientAddress}
-                            onChange={(e) => setRecipientAddress(e.target.value.trim())}
-                            placeholder="0x... or vitalik.eth"
-                            className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
-                        />
-                        {isResolvingENS && (
-                            <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
-                        )}
-                        {isENS && !isResolvingENS && resolvedENSAddress && (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        )}
-                        {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                        )}
-                    </div>
-                    {/* Show resolved address below ENS name */}
-                    {isENS && resolvedENSAddress && (
-                        <p className="text-[10px] text-zinc-600 mt-1 font-mono">
-                            → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
-                        </p>
-                    )}
-                </div>
-
-                {/* 2. Amount Field */}
-                <div className="flex items-center gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+            <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+                {/* 1. Amount Field */}
+                <div className="flex-1 flex items-center gap-4 bg-zinc-950 p-4 rounded-xl border border-zinc-800 min-h-[100px]">
                     <div className="flex-1">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Pay (Sepolia)</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Pay (Sepolia)</p>
                         <div className="flex items-center gap-2">
                             <Input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="bg-transparent border-none text-xl p-0 h-auto focus-visible:ring-0 text-white font-bold"
+                                className="bg-transparent border-none text-3xl md:text-4xl p-0 h-auto focus-visible:ring-0 text-white font-bold font-mono tracking-tight tabular-nums"
                             />
-                            <span className="font-bold text-zinc-400">ETH</span>
+                            <span className="font-bold text-zinc-400 text-lg md:text-xl mt-1">ETH</span>
                         </div>
                     </div>
-                    <ArrowRight className="text-zinc-600" />
+                    <ArrowRight className="text-zinc-600 h-5 w-5" />
                     <div className="flex-1 text-right">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Receive (Cross-Chain)</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Receive (Cross-Chain)</p>
                         <div className="flex items-center justify-end gap-2">
-                            <span className="text-xl font-bold text-white">
+                            <span className="text-3xl md:text-4xl font-bold text-white font-mono tracking-tight tabular-nums">
                                 ~{(Number(amount) * 2800).toFixed(2)}
                             </span>
-                            <span className="font-bold text-blue-400">USDC</span>
+                            <span className="font-bold text-blue-400 text-lg md:text-xl mt-1">USDC</span>
                         </div>
                     </div>
                 </div>
 
-                <Button
-                    onClick={handleZap}
-                    disabled={loading || !amount || Number(amount) <= 0}
-                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12 text-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
-                >
-                    {loading ? (
-                        <span className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" /> {status}
-                        </span>
-                    ) : (
-                        "Zap Money Instantly ⚡"
-                    )}
-                </Button>
+                {/* Divider line */}
+                <div className="h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent"></div>
+
+                {/* CONTROLS container to match Flash Stream layout */}
+                <div className="space-y-4">
+                    {/* 2. Recipient Field with ENS Support */}
+                    <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
+                            Recipient (Address or ENS)
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                value={recipientAddress}
+                                onChange={(e) => setRecipientAddress(e.target.value.trim())}
+                                placeholder="0x... or vitalik.eth"
+                                className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
+                            />
+                            {isResolvingENS && (
+                                <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                            )}
+                            {isENS && !isResolvingENS && resolvedENSAddress && (
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            )}
+                            {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
+                                <AlertCircle className="h-4 w-4 text-red-500" />
+                            )}
+                        </div>
+                        {/* Show resolved address below ENS name */}
+                        {isENS && resolvedENSAddress && (
+                            <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                                → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
+                            </p>
+                        )}
+                    </div>
+
+                    <Button
+                        onClick={handleZap}
+                        disabled={loading || !amount || Number(amount) <= 0}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12"
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" /> {status}
+                            </span>
+                        ) : (
+                            "Zap Money Instantly ⚡"
+                        )}
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     );
