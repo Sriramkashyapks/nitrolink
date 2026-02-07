@@ -137,7 +137,7 @@ export function ZapWidget() {
                 {/* 1. Amount Field */}
                 <div className="flex-1 flex items-center gap-4 bg-zinc-950 p-4 rounded-xl border border-zinc-800 min-h-[100px]">
                     <div className="flex-1">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Pay (Sepolia)</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Pay (Sepolia)</p>
                         <div className="flex items-center gap-2">
                             <Input
                                 type="number"
@@ -150,7 +150,7 @@ export function ZapWidget() {
                     </div>
                     <ArrowRight className="text-zinc-600 h-5 w-5" />
                     <div className="flex-1 text-right">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Receive (Cross-Chain)</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Receive (Cross-Chain)</p>
                         <div className="flex items-center justify-end gap-2">
                             <span className="text-3xl md:text-4xl font-bold text-white font-mono tracking-tight tabular-nums">
                                 ~{(Number(amount) * 2800).toFixed(2)}
