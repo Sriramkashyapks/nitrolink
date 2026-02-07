@@ -123,7 +123,7 @@ export function ZapWidget() {
     };
 
     return (
-        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden">
+        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden flex flex-col">
             {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
 
             <CardHeader>
@@ -133,20 +133,9 @@ export function ZapWidget() {
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4">
-                {/* 1. Recipient Field (New) */}
-                <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
-                    <Input
-                        value={recipientAddress}
-                        onChange={(e) => setRecipientAddress(e.target.value.trim())}
-                        placeholder="0x..."
-                        className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
-                    />
-                </div>
-
-                {/* 2. Amount Field */}
-                <div className="flex items-center gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+            <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+                {/* 1. Amount Field */}
+                <div className="flex-1 flex items-center gap-4 bg-zinc-950 p-4 rounded-xl border border-zinc-800 min-h-[100px]">
                     <div className="flex-1">
                         <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Pay (Sepolia)</p>
                         <div className="flex items-center gap-2">
@@ -154,36 +143,50 @@ export function ZapWidget() {
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="bg-transparent border-none text-xl p-0 h-auto focus-visible:ring-0 text-white font-bold"
+                                className="bg-transparent border-none text-3xl md:text-4xl p-0 h-auto focus-visible:ring-0 text-white font-bold font-mono tracking-tight tabular-nums"
                             />
-                            <span className="font-bold text-zinc-400">ETH</span>
+                            <span className="font-bold text-zinc-400 text-lg md:text-xl mt-1">ETH</span>
                         </div>
                     </div>
-                    <ArrowRight className="text-zinc-600" />
+                    <ArrowRight className="text-zinc-600 h-5 w-5" />
                     <div className="flex-1 text-right">
                         <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Receive (Cross-Chain)</p>
                         <div className="flex items-center justify-end gap-2">
-                            <span className="text-xl font-bold text-white">
+                            <span className="text-3xl md:text-4xl font-bold text-white font-mono tracking-tight tabular-nums">
                                 ~{(Number(amount) * 2800).toFixed(2)}
                             </span>
-                            <span className="font-bold text-blue-400">USDC</span>
+                            <span className="font-bold text-blue-400 text-lg md:text-xl mt-1">USDC</span>
                         </div>
                     </div>
                 </div>
 
-                <Button
-                    onClick={handleZap}
-                    disabled={loading || !amount || Number(amount) <= 0}
-                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12 text-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
-                >
-                    {loading ? (
-                        <span className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" /> {status}
-                        </span>
-                    ) : (
-                        "Zap Money Instantly ⚡"
-                    )}
-                </Button>
+                {/* CONTROLS container to match Flash Stream layout */}
+                <div className="space-y-4">
+                    {/* 2. Recipient Field */}
+                    <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
+                        <Input
+                            value={recipientAddress}
+                            onChange={(e) => setRecipientAddress(e.target.value.trim())}
+                            placeholder="0x..."
+                            className="bg-transparent border-none text-lg p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
+                        />
+                    </div>
+
+                    <Button
+                        onClick={handleZap}
+                        disabled={loading || !amount || Number(amount) <= 0}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12"
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" /> {status}
+                            </span>
+                        ) : (
+                            "Zap Money Instantly ⚡"
+                        )}
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     );
