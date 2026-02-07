@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react"
+import { ENSOrAddress } from "./ens-or-address"
 
 // This type is used to define the shape of our data.
 export type Transaction = {
@@ -12,6 +13,7 @@ export type Transaction = {
     status: string
     createdAt: string
     userAddress: string
+    recipientAddress?: string  // Optional for backward compatibility
     txHash: string
 }
 
@@ -51,6 +53,15 @@ export const columns: ColumnDef<Transaction>[] = [
                     {status}
                 </div>
             )
+        }
+    },
+    {
+        accessorKey: "recipientAddress",
+        header: "Recipient",
+        cell: ({ row }) => {
+            const recipient = row.original.recipientAddress
+            if (!recipient) return <div className="text-zinc-600 text-xs">-</div>
+            return <ENSOrAddress address={recipient} />
         }
     },
     {
