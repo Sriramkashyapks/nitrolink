@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useWalletClient, useAccount } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 import { getQuote, executeRoute } from '@lifi/sdk';
@@ -8,11 +8,10 @@ import { parseEther } from 'viem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowRight, Wallet, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, ArrowRight, Wallet, Zap } from 'lucide-react';
 import Confetti from 'react-confetti';
 import useSound from 'use-sound';
 import { toast } from 'sonner';
-import { useENSResolution } from '@/hooks/useENS';
 
 // REAL CONFIG: Ethereum Sepolia -> Arbitrum Sepolia
 // We move money FROM where you have it (Sepolia)
@@ -29,18 +28,12 @@ export function ZapWidget() {
     const queryClient = useQueryClient();
 
     const [amount, setAmount] = useState('0.01');
-    const [recipientAddress, setRecipientAddress] = useState('');
+    const [recipientAddress, setRecipientAddress] = useState('0x1a1A744bc556300d7D42475D0c21C737c02C9A74');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('');
     const [showConfetti, setShowConfetti] = useState(false);
 
     const [playCash] = useSound('/cha-ching.mp3', { volume: 0.5 });
-
-    // ENS Resolution for recipient
-    const { address: resolvedENSAddress, isLoading: isResolvingENS, isENS } = useENSResolution(recipientAddress);
-
-    // Final address to use - resolved ENS or direct address
-    const finalRecipientAddress = isENS && resolvedENSAddress ? resolvedENSAddress : recipientAddress;
 
     const handleZap = async () => {
         if (!address || !signer) {
@@ -48,15 +41,9 @@ export function ZapWidget() {
             return;
         }
 
-        // Validate recipient - either valid address or resolved ENS
-        if (!finalRecipientAddress || !finalRecipientAddress.startsWith('0x')) {
-            if (isENS && isResolvingENS) {
-                toast.error("Still resolving ENS name...");
-            } else if (isENS && !resolvedENSAddress) {
-                toast.error("Could not resolve ENS name");
-            } else {
-                toast.error("Please enter a valid address or ENS name");
-            }
+        const cleanRecipient = recipientAddress.trim();
+        if (!cleanRecipient || !cleanRecipient.startsWith('0x')) {
+            toast.error("Please enter a valid recipient address");
             return;
         }
 
@@ -76,7 +63,7 @@ export function ZapWidget() {
                     fromAmount: (Number(amount) * 10 ** 18).toString(),
                     toChain: ZAP_CONFIG.toChain,
                     toToken: ZAP_CONFIG.toToken,
-                    toAddress: finalRecipientAddress, // Use resolved ENS address!
+                    toAddress: cleanRecipient, // Use the recipient address here!
                 });
 
                 usedCrossChain = true;
@@ -96,7 +83,7 @@ export function ZapWidget() {
                 setStatus('Please confirm transfer in wallet...');
 
                 txHash = await signer.sendTransaction({
-                    to: finalRecipientAddress as `0x${string}`, // Use resolved ENS address!
+                    to: cleanRecipient as `0x${string}`, // Use the recipient address here!
                     value: parseEther(amount),
                 });
             }
@@ -112,7 +99,7 @@ export function ZapWidget() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userAddress: address,
-                    recipientAddress: finalRecipientAddress, // Save the resolved address
+                    recipientAddress: cleanRecipient,
                     type: 'Zap',
                     asset: 'ETH',
                     amount: amount,
@@ -147,34 +134,15 @@ export function ZapWidget() {
             </CardHeader>
 
             <CardContent className="space-y-4">
-                {/* 1. Recipient Field with ENS Support */}
+                {/* 1. Recipient Field (New) */}
                 <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
-                        Recipient (Address or ENS)
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            value={recipientAddress}
-                            onChange={(e) => setRecipientAddress(e.target.value.trim())}
-                            placeholder="0x... or vitalik.eth"
-                            className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
-                        />
-                        {isResolvingENS && (
-                            <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
-                        )}
-                        {isENS && !isResolvingENS && resolvedENSAddress && (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        )}
-                        {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                        )}
-                    </div>
-                    {/* Show resolved address below ENS name */}
-                    {isENS && resolvedENSAddress && (
-                        <p className="text-[10px] text-zinc-600 mt-1 font-mono">
-                            → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
-                        </p>
-                    )}
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
+                    <Input
+                        value={recipientAddress}
+                        onChange={(e) => setRecipientAddress(e.target.value.trim())}
+                        placeholder="0x..."
+                        className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
+                    />
                 </div>
 
                 {/* 2. Amount Field */}

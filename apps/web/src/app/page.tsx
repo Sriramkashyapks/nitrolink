@@ -9,8 +9,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { LayoutDashboard, Zap, Radio } from 'lucide-react';
 import { FlashStreamWidget } from '@/components/flash-stream-widget';
 import { Footer } from '@/components/footer';
-// Uncomment to show ENS DeFi Preferences (Creative Feature!)
-// import { ENSPreferencesPanel } from '@/components/ens-preferences-panel';
 
 // Helper to force correct network names based on ID
 const getNetworkName = (chain: any) => {
