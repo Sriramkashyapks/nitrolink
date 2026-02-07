@@ -1,9 +1,11 @@
-import { createConfig, http } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
+import { createConfig, http, createStorage, cookieStorage } from 'wagmi';
+import { mainnet, baseSepolia, sepolia, arbitrumSepolia } from 'wagmi/chains';
 import { defineChain } from 'viem';
 import { getDefaultConfig } from 'connectkit';
 
-// We define Arc Testnet manually
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_ID || "";
+
+// Arc Testnet definition
 export const arcTestnet = defineChain({
     id: 5_042_002,
     name: 'Arc Testnet',
@@ -19,20 +21,36 @@ export const arcTestnet = defineChain({
     testnet: true,
 });
 
-// We create the configuration and EXPORT it so providers.tsx can find it
+// API URL configuration for backend calls
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+
 export const config = createConfig(
     getDefaultConfig({
-        // You can replace this string with your Project ID later
-        walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID || "YOUR_PROJECT_ID_HERE",
-
-        appName: "NitroLink",
-
-        // We include Mainnet for ENS, Arc for payments
-        chains: [arcTestnet, mainnet],
-
+        // Your chains - Sepolia is now first to match user's wallet
+        chains: [sepolia, baseSepolia, arbitrumSepolia, arcTestnet, mainnet],
         transports: {
+            [sepolia.id]: http(),
+            [baseSepolia.id]: http(),
+            [arbitrumSepolia.id]: http(),
             [arcTestnet.id]: http(),
             [mainnet.id]: http("https://eth.llamarpc.com"),
         },
-    })
+
+        // Required API Keys
+        walletConnectProjectId,
+
+        // Required App Info
+        appName: "NitroLink",
+
+        // Optional App Info
+        appDescription: "Instant crypto streaming and cross-chain settlements",
+        appUrl: "http://localhost:3000", // Updated for development
+        appIcon: "https://i.imgur.com/placeholder.png", // Updated to avoid conflicts
+    }),
 );
+
+declare module 'wagmi' {
+    interface Register {
+        config: typeof config;
+    }
+}

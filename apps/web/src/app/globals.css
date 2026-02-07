@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -119,5 +117,47 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Custom Scrollbar Styles - Hidden by default, visible on hover */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  /* Show scrollbar on hover */
+  .scrollbar-thin:hover::-webkit-scrollbar-track {
+    background: rgb(24 24 27);
+    /* zinc-900 */
+  }
+
+  .scrollbar-thin:hover::-webkit-scrollbar-thumb {
+    background: rgb(63 63 70);
+    /* zinc-700 */
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(82 82 91);
+    /* zinc-600 */
+  }
+
+  /* Firefox scrollbar - hidden by default */
+  .scrollbar-thin {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-thin:hover {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(63 63 70) rgb(24 24 27);
   }
 }
