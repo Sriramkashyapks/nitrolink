@@ -108,17 +108,17 @@ export default function Home() {
                         {/* ROW 1: WIDGETS (Side-by-Side) */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                             {/* Main Zap Widget */}
-                            <div className="relative group">
+                            <div className="relative group h-full">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
-                                <div className="relative">
+                                <div className="relative h-full">
                                     <ZapWidget />
                                 </div>
                             </div>
 
                             {/* Flash Stream Widget */}
-                            <div className="relative group">
+                            <div className="relative group h-full">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
-                                <div className="relative">
+                                <div className="relative h-full">
                                     <FlashStreamWidget />
                                 </div>
                             </div>

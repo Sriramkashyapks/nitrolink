@@ -123,7 +123,7 @@ export function ZapWidget() {
     };
 
     return (
-        <Card className="w-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden">
+        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden">
             {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
 
             <CardHeader>
