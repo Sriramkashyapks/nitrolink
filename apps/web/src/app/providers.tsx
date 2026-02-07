@@ -7,6 +7,23 @@ import { config } from '@/lib/config';
 
 import { Toaster } from 'sonner';
 
+// Suppress harmless Aave/Family Accounts SDK warnings
+if (typeof window !== 'undefined') {
+  const originalError = console.error;
+  console.error = (...args) => {
+    // Join all arguments to catch errors with multiple parts
+    const message = args.join(' ');
+    // Suppress known harmless wallet connection warnings
+    if (message.includes('Aave Wallet') ||
+      message.includes('Family Accounts') ||
+      message.includes('FamilyAccountsSdk') ||
+      message.includes('EIP1193 provider connection timeout')) {
+      return; // Suppress these warnings - they're harmless
+    }
+    originalError.apply(console, args);
+  };
+}
+
 // Create a new client for React Query. This handles caching and updating data.
 function makeQueryClient() {
   return new QueryClient({
