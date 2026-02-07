@@ -4,17 +4,14 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for Vercel frontend
+  // Enable CORS - allow all origins for hackathon
   app.enableCors({
-    origin: [
-      'http://localhost:3000',           // Local development
-      'https://*.vercel.app',            // Any Vercel deployment
-      /^https:\/\/.*\.vercel\.app$/,    // Vercel deployment regex
-    ],
+    origin: true,  // Allows all origins
     credentials: true,
   });
 
   const port = process.env.PORT || 5001;
   await app.listen(port);
+  console.log(`🚀 Application is running on port: ${port}`);
 }
 bootstrap();
