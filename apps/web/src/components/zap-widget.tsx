@@ -147,37 +147,7 @@ export function ZapWidget() {
             </CardHeader>
 
             <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
-                {/* 1. Recipient Field with ENS Support */}
-                <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
-                        Recipient (Address or ENS)
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            value={recipientAddress}
-                            onChange={(e) => setRecipientAddress(e.target.value.trim())}
-                            placeholder="0x... or vitalik.eth"
-                            className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
-                        />
-                        {isResolvingENS && (
-                            <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
-                        )}
-                        {isENS && !isResolvingENS && resolvedENSAddress && (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        )}
-                        {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                        )}
-                    </div>
-                    {/* Show resolved address below ENS name */}
-                    {isENS && resolvedENSAddress && (
-                        <p className="text-[10px] text-zinc-600 mt-1 font-mono">
-                            → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
-                        </p>
-                    )}
-                </div>
-
-                {/* 2. Amount Field */}
+                {/* 1. Amount Field */}
                 <div className="flex-1 flex items-center gap-4 bg-zinc-950 p-4 rounded-xl border border-zinc-800 min-h-[100px]">
                     <div className="flex-1">
                         <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Pay (Sepolia)</p>
@@ -205,15 +175,34 @@ export function ZapWidget() {
 
                 {/* CONTROLS container to match Flash Stream layout */}
                 <div className="space-y-4">
-                    {/* 2. Recipient Field */}
+                    {/* 2. Recipient Field with ENS Support */}
                     <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">Recipient Address</p>
-                        <Input
-                            value={recipientAddress}
-                            onChange={(e) => setRecipientAddress(e.target.value.trim())}
-                            placeholder="0x..."
-                            className="bg-transparent border-none text-lg p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono"
-                        />
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
+                            Recipient (Address or ENS)
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                value={recipientAddress}
+                                onChange={(e) => setRecipientAddress(e.target.value.trim())}
+                                placeholder="0x... or vitalik.eth"
+                                className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
+                            />
+                            {isResolvingENS && (
+                                <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                            )}
+                            {isENS && !isResolvingENS && resolvedENSAddress && (
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            )}
+                            {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
+                                <AlertCircle className="h-4 w-4 text-red-500" />
+                            )}
+                        </div>
+                        {/* Show resolved address below ENS name */}
+                        {isENS && resolvedENSAddress && (
+                            <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                                → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
+                            </p>
+                        )}
                     </div>
 
                     <Button
