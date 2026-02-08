@@ -14,6 +14,7 @@ export type Transaction = {
     status: string
     createdAt: string
     userAddress: string
+    recipientAddress?: string  // Optional for backward compatibility
     txHash: string
 }
 
@@ -26,13 +27,13 @@ export const columns: ColumnDef<Transaction>[] = [
             const type = row.getValue("type") as string;
             if (!type) return null;
             return (
-                <div className="font-medium flex items-center gap-2 whitespace-nowrap">
+                <div className="font-medium flex items-center gap-2">
                     {type === 'Zap' ? (
-                        <ArrowUpRight className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                        <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                     ) : (
-                        <ArrowDownLeft className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                        <ArrowDownLeft className="h-4 w-4 text-blue-500" />
                     )}
-                    <span className="truncate">{type}</span>
+                    {type}
                 </div>
             )
         },
@@ -41,7 +42,7 @@ export const columns: ColumnDef<Transaction>[] = [
         accessorKey: "asset",
         header: "Asset",
         cell: ({ row }) => {
-            return <div className="text-zinc-300 truncate">{row.getValue("asset")}</div>
+            return <div className="text-zinc-300">{row.getValue("asset")}</div>
         }
     },
     {
@@ -50,9 +51,39 @@ export const columns: ColumnDef<Transaction>[] = [
         cell: ({ row }) => {
             const status = row.getValue("status") as string
             return (
-                <div className={`text-xs px-2 py-1 rounded-full inline-block whitespace-nowrap ${status === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-400'
+                <div className={`text-xs px-2 py-1 rounded-full inline-block ${status === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-400'
                     }`}>
                     {status}
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "recipientAddress",
+        header: "Recipient",
+        cell: ({ row }) => {
+            const recipient = row.original.recipientAddress
+            if (!recipient) return <div className="text-zinc-600 text-xs">-</div>
+
+            const handleCopy = async () => {
+                try {
+                    await navigator.clipboard.writeText(recipient)
+                    toast.success("Recipient address copied!", {
+                        description: `${recipient.slice(0, 10)}...${recipient.slice(-8)}`
+                    })
+                } catch (err) {
+                    toast.error("Failed to copy to clipboard")
+                }
+            }
+
+            return (
+                <div
+                    className="cursor-pointer hover:text-emerald-400 transition-colors group flex items-center gap-1.5"
+                    onClick={handleCopy}
+                    title={`${recipient}\n\nClick to copy`}
+                >
+                    <ENSOrAddress address={recipient} />
+                    <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 </div>
             )
         }
@@ -67,7 +98,7 @@ export const columns: ColumnDef<Transaction>[] = [
                 currency: "USD",
             }).format(amount)
 
-            return <div className="text-right font-mono text-emerald-400 font-bold whitespace-nowrap">+{formatted}</div>
+            return <div className="text-right font-mono text-emerald-400 font-bold">+{formatted}</div>
         },
     },
     {
@@ -90,9 +121,9 @@ export const columns: ColumnDef<Transaction>[] = [
 
             return (
                 <div
-                    className="text-zinc-300 font-mono text-xs cursor-pointer hover:text-emerald-400 transition-colors group relative flex items-center gap-1.5"
+                    className="text-zinc-300 font-mono text-xs cursor-pointer hover:text-emerald-400 transition-colors group flex items-center gap-1.5"
                     onClick={handleCopy}
-                    title={`${txHash}`}
+                    title={`${txHash}\n\nClick to copy`}
                 >
                     <span className="hidden sm:inline">{shortHash}</span>
                     <span className="sm:hidden">{txHash.slice(0, 8)}...</span>

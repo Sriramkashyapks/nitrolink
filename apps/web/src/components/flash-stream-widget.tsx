@@ -97,18 +97,20 @@ export function FlashStreamWidget() {
             });
 
             // B. Save to DB (Optional but good for history)
+            const transactionData = {
+                userAddress: address,
+                recipientAddress: finalRecipientAddress, // Save resolved address!
+                type: 'Stream Settlement',
+                asset: 'USDC',
+                amount: finalAmount,
+                txHash: txHash,
+                status: 'Success'
+            };
+
             await fetch(`${apiUrl}/transaction`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userAddress: address,
-                    recipientAddress: finalRecipientAddress, // Save resolved address!
-                    type: 'Stream Settlement',
-                    asset: 'USDC',
-                    amount: finalAmount,
-                    txHash: txHash,
-                    status: 'Success'
-                })
+                body: JSON.stringify(transactionData)
             });
 
             toast.dismiss();

@@ -6,11 +6,14 @@ export class Transaction extends Document {
     @Prop({ required: true })
     userAddress: string;
 
-    @Prop({ required: true })
-    type: string; // "Zap"
+    @Prop()
+    recipientAddress?: string; // Recipient of the transaction (optional for backward compatibility)
 
     @Prop({ required: true })
-    asset: string; // "USDC"
+    type: string; // "Zap" or "Stream Settlement"
+
+    @Prop({ required: true })
+    asset: string; // "USDC", "ETH", etc.
 
     @Prop({ required: true })
     amount: string;
