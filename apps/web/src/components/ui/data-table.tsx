@@ -32,8 +32,8 @@ export function DataTable<TData, TValue>({
     })
 
     return (
-        <div className="rounded-md border border-zinc-800">
-            <Table>
+        <div className="rounded-md border border-zinc-800 overflow-hidden">
+            <Table className="min-w-full">
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id} className="border-zinc-800 hover:bg-transparent">
@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
                                 className="border-zinc-800 hover:bg-zinc-800/50"
                             >
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
+                                    <TableCell key={cell.id} className="max-w-[200px] overflow-hidden">
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
