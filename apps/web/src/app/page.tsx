@@ -60,7 +60,7 @@ export default function Home() {
                                 Live on Sepolia Testnet
                             </div>
 
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500 px-2">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500 px-2 py-2">
                                 Money moving at <br /> the speed of thought.
                             </h1>
 
