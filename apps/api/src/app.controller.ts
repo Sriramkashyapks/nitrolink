@@ -26,7 +26,24 @@ export class AppController {
   // 2. Save Transaction (Call this after Zap)
   @Post('transaction')
   async createTransaction(@Body() body: any) {
-    return this.txModel.create(body);
+    const result = await this.txModel.create(body);
+    return result;
+  }
+
+  // TEST ENDPOINT - Create a test transaction with recipientAddress
+  @Post('transaction/test')
+  async createTestTransaction() {
+    const testData = {
+      userAddress: '0x1234567890123456789012345678901234567890',
+      recipientAddress: '0x0987654321098765432109876543210987654321',
+      type: 'Test Zap',
+      asset: 'ETH',
+      amount: '0.01',
+      txHash: '0xtest' + Date.now(),
+      status: 'Success'
+    };
+    const result = await this.txModel.create(testData);
+    return result;
   }
 
   // 3. Get History (Call this for the Table)

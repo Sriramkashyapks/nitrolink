@@ -108,18 +108,20 @@ export function ZapWidget() {
             setShowConfetti(true);
 
             // Save Transaction to DB
+            const transactionData = {
+                userAddress: address,
+                recipientAddress: finalRecipientAddress, // Save the resolved address
+                type: 'Zap',
+                asset: 'ETH',
+                amount: amount,
+                txHash: txHash,
+                status: 'Success'
+            };
+
             await fetch(`${apiUrl}/transaction`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userAddress: address,
-                    recipientAddress: finalRecipientAddress, // Save the resolved address
-                    type: 'Zap',
-                    asset: 'ETH',
-                    amount: amount,
-                    txHash: txHash,
-                    status: 'Success'
-                })
+                body: JSON.stringify(transactionData)
             });
 
             queryClient.invalidateQueries({ queryKey: ['transactions', address] });
@@ -182,13 +184,14 @@ export function ZapWidget() {
                     {/* 2. Recipient Field with ENS Support */}
                     <div className="bg-zinc-950 p-2.5 sm:p-3 rounded-lg border border-zinc-800">
                         <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
-                            Recipient (Address or ENS)
+                            Recipient (Address or ENS) <span className="text-red-500">*</span>
                         </p>
                         <div className="flex items-center gap-2 min-w-0">
                             <Input
                                 value={recipientAddress}
                                 onChange={(e) => setRecipientAddress(e.target.value.trim())}
                                 placeholder="0x... or vitalik.eth"
+                                required
                                 className="bg-transparent border-none text-xs sm:text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1 min-w-0 truncate"
                             />
                             {isResolvingENS && (

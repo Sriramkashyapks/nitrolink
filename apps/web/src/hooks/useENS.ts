@@ -11,17 +11,37 @@ import { mainnet } from 'wagmi/chains';
  */
 export function useENSResolution(input: string | undefined) {
     const [isValidENS, setIsValidENS] = useState(false);
+    const [normalizedName, setNormalizedName] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (input && input.includes('.eth')) {
-            setIsValidENS(true);
+        if (!input) {
+            setIsValidENS(false);
+            setNormalizedName(undefined);
+            return;
+        }
+
+        // Check if it's an ENS name (ends with .eth or contains .eth.)
+        const isENSFormat = input.endsWith('.eth') || input.includes('.eth.');
+
+        if (isENSFormat) {
+            try {
+                // Try to normalize the ENS name
+                const normalized = normalize(input);
+                setNormalizedName(normalized);
+                setIsValidENS(true);
+            } catch (error) {
+                console.error('ENS normalization failed:', error);
+                setIsValidENS(false);
+                setNormalizedName(undefined);
+            }
         } else {
             setIsValidENS(false);
+            setNormalizedName(undefined);
         }
     }, [input]);
 
     const { data: resolvedAddress, isLoading } = useEnsAddress({
-        name: isValidENS ? normalize(input!) : undefined,
+        name: normalizedName,
         chainId: mainnet.id,
     });
 
