@@ -14,7 +14,6 @@ export type Transaction = {
     status: string
     createdAt: string
     userAddress: string
-    recipientAddress?: string  // Optional for backward compatibility
     txHash: string
 }
 
@@ -56,15 +55,6 @@ export const columns: ColumnDef<Transaction>[] = [
                     {status}
                 </div>
             )
-        }
-    },
-    {
-        accessorKey: "recipientAddress",
-        header: "Recipient",
-        cell: ({ row }) => {
-            const recipient = row.original.recipientAddress
-            if (!recipient) return <div className="text-zinc-600 text-xs">-</div>
-            return <div className="max-w-[120px] sm:max-w-[150px]"><ENSOrAddress address={recipient} /></div>
         }
     },
     {
