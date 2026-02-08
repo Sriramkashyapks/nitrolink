@@ -129,7 +129,7 @@ export function FlashStreamWidget() {
     };
 
     return (
-        <Card className="h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden group flex flex-col">
+        <Card className="h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden group flex flex-col max-w-full">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-yellow-500/10 blur-[50px] rounded-full group-hover:bg-yellow-500/20 transition-all duration-700 pointer-events-none" />
 
             <CardHeader className="border-b border-zinc-800/50">
@@ -139,20 +139,20 @@ export function FlashStreamWidget() {
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+            <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col justify-between p-4 sm:p-6">
                 {/* TICKER - Reduced size */}
-                <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden min-h-[100px]">
+                <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center relative overflow-hidden min-h-[120px] sm:min-h-[100px]">
                     {isStreaming && (
                         <div className="absolute inset-0 bg-yellow-500/5 animate-pulse" />
                     )}
 
-                    <span className="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+                    <span className="text-zinc-500 text-[10px] sm:text-xs uppercase tracking-wider mb-1">
                         Real-Time Value
                     </span>
-                    <div className="text-4xl md:text-5xl font-mono font-bold text-white tabular-nums tracking-tight z-10">
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tabular-nums tracking-tight z-10 truncate max-w-full px-2">
                         ${streamedAmount.toFixed(6)}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-emerald-400 z-10 h-5">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mt-1 text-[10px] sm:text-xs text-emerald-400 z-10 h-5">
                         {isStreaming ? (
                             <>
                                 <Clock className="h-3 w-3 animate-spin" />
@@ -168,106 +168,72 @@ export function FlashStreamWidget() {
                 <div className="h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent"></div>
 
                 {/* CONTROLS */}
-                <div className="space-y-4">
-                    <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="bg-zinc-950 p-2.5 sm:p-3 rounded-lg border border-zinc-800">
+                        <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
                             Recipient (Address or ENS)
                         </p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                             <Input
                                 placeholder="0x... or vitalik.eth"
                                 value={recipient}
                                 onChange={(e) => setRecipient(e.target.value.trim())}
                                 disabled={isStreaming}
-                                className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-yellow-400 font-mono flex-1"
+                                className="bg-transparent border-none text-xs sm:text-sm p-0 h-auto focus-visible:ring-0 text-yellow-400 font-mono flex-1 min-w-0 truncate"
                             />
                             {isResolvingENS && (
-                                <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                                <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin text-blue-400 flex-shrink-0" />
                             )}
                             {isENS && !isResolvingENS && resolvedENSAddress && (
-                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 flex-shrink-0" />
                             )}
                             {isENS && !isResolvingENS && !resolvedENSAddress && recipient && (
-                                <AlertCircle className="h-4 w-4 text-red-500" />
+                                <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500 flex-shrink-0" />
                             )}
                         </div>
                         {/* Show resolved address below ENS name */}
                         {isENS && resolvedENSAddress && (
-                            <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                            <p className="text-[9px] sm:text-[10px] text-zinc-600 mt-1 font-mono">
                                 → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
                             </p>
                         )}
                     </div>
 
-                    <div className="flex flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         {!isStreaming ? (
                             <Button
                                 onClick={handleStartStream}
                                 disabled={isSettling}
-                                className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-bold h-12"
+                                className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-bold h-11 sm:h-12 text-sm sm:text-base"
                             >
-                                <Play className="h-4 w-4 mr-2 fill-black" /> Start Stream
+                                <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 fill-black" /> Start Stream
                             </Button>
                         ) : (
-                            <>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleStopStream}
-                                    className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 h-12"
-                                >
-                                    <Square className="h-4 w-4 mr-2 fill-white" /> Pause Stream
-                                </Button>
-
-                                {/* SETTLE BUTTON - Appears next to Pause when streaming implies we might want to settle while streaming? 
-                                    Request said: "when the new button appears, place the settle and pay button right next to start/stream button after clicking it"
-                                    Usually you pause then settle, but if user wants it next to it, we can show it if balance > 0.
-                                    The logic below shows Settle button only if NOT streaming and balance > 0 in original code.
-                                    If user wants it *while* streaming or just side-by-side with Pause, I should probably check logic. 
-                                    Original request: "when i click on start stream and pause stream, another button below will appear account for that aswell... place the settle and pay button right next to start/stream button after clicking it".
-                                    
-                                    Wait, the original code only showed Settle if !isStreaming && streamedAmount > 0.
-                                    If I click Start Stream -> Box changes to "Pause Stream".
-                                    If I click Pause Stream -> Box changes to "Start Stream" AND "Settle" appears below (in original).
-                                    User wants: When "Start" becomes "Pause", does he want Settle there? No, Settle needs balance.
-                                    
-                                    Let's stick to: When we are in the state where Settle is available (i.e. Paused with balance),
-                                    Ensure "Start" and "Settle" are side-by-side? 
-                                    OR
-                                    Did user mean "Pause" and "Settle" side by side?
-                                    "place the settle and pay button right next to start/stream button after clicking it"
-                                    
-                                    Case A: Stream Active. Button is "Pause".
-                                    Case B: Stream Paused (Amount > 0). Buttons are "Start" and "Settle".
-                                    
-                                    Let's assume Case B is what needs side-by-side. 
-                                    Original code had: grid-cols-2. Start was col-span-2 (full width). Settle was col-span-2 (full width) below it.
-                                    So I will make them share the row.
-                                */}
-
-                            </>
+                            <Button
+                                variant="destructive"
+                                onClick={handleStopStream}
+                                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 h-11 sm:h-12 text-sm sm:text-base"
+                            >
+                                <Square className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 fill-white" /> Pause Stream
+                            </Button>
                         )}
 
-                        {/* CORRECT LOGIC FOR SIDE-BY-SIDE 'START' and 'SETTLE' (When Paused + Money) */}
+                        {/* SETTLE BUTTON - Shows when paused with balance */}
                         {!isStreaming && streamedAmount > 0 && (
                             <Button
                                 onClick={handleSettle}
                                 disabled={isSettling}
-                                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black font-bold animate-in fade-in zoom-in h-12"
+                                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black font-bold animate-in fade-in zoom-in h-11 sm:h-12 text-sm sm:text-base"
                             >
                                 {isSettling ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 animate-spin" />
                                 ) : (
-                                    <Banknote className="h-4 w-4 mr-2" />
+                                    <Banknote className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                 )}
                                 Settle
                             </Button>
                         )}
                     </div>
-                    {/* If we are just idle (no stream, no money), 'Start' needs to be full width. 
-                        The flex container above will handle it if we make Start flex-1. 
-                        But we removed the isStreaming check block from inside the flex container in my draft above.
-                        Let's rewrite the logic cleanly in the replacement content.
-                     */}
                 </div>
             </CardContent>
         </Card>

@@ -67,28 +67,28 @@ export function RecentTransactions() {
 
     return (
         <Card className="h-full bg-zinc-900 border-zinc-800 text-white flex flex-col">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-zinc-100">
-                    <Activity className="h-5 w-5 text-blue-500" />
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-zinc-100 text-base sm:text-lg">
+                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                     Recent Activity
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-hidden">
+            <CardContent className="flex-1 overflow-hidden p-3 sm:p-6">
                 {isLoading ? (
-                    <div className="flex justify-center p-8">
-                        <Loader2 className="h-6 w-6 animate-spin text-zinc-500" />
+                    <div className="flex justify-center p-6 sm:p-8">
+                        <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-zinc-500" />
                     </div>
                 ) : (
-                    <div className="h-full max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
+                    <div className="h-full max-h-[250px] sm:max-h-[300px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
                         <DataTable columns={columns} data={transactions} />
 
                         {/* Intersection observer target */}
                         {hasNextPage && (
-                            <div ref={observerRef} className="py-4 text-center">
+                            <div ref={observerRef} className="py-3 sm:py-4 text-center">
                                 {isFetchingNextPage ? (
-                                    <Loader2 className="h-5 w-5 animate-spin text-zinc-500 mx-auto" />
+                                    <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-zinc-500 mx-auto" />
                                 ) : (
-                                    <div className="text-zinc-600 text-sm">Scroll for more</div>
+                                    <div className="text-zinc-600 text-xs sm:text-sm">Scroll for more</div>
                                 )}
                             </div>
                         )}

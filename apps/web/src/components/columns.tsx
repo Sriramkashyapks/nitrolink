@@ -26,13 +26,13 @@ export const columns: ColumnDef<Transaction>[] = [
             const type = row.getValue("type") as string;
             if (!type) return null;
             return (
-                <div className="font-medium flex items-center gap-2">
+                <div className="font-medium flex items-center gap-2 whitespace-nowrap">
                     {type === 'Zap' ? (
-                        <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                        <ArrowUpRight className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                     ) : (
-                        <ArrowDownLeft className="h-4 w-4 text-blue-500" />
+                        <ArrowDownLeft className="h-4 w-4 text-blue-500 flex-shrink-0" />
                     )}
-                    {type}
+                    <span className="truncate">{type}</span>
                 </div>
             )
         },
@@ -41,7 +41,7 @@ export const columns: ColumnDef<Transaction>[] = [
         accessorKey: "asset",
         header: "Asset",
         cell: ({ row }) => {
-            return <div className="text-zinc-300">{row.getValue("asset")}</div>
+            return <div className="text-zinc-300 truncate">{row.getValue("asset")}</div>
         }
     },
     {
@@ -50,7 +50,7 @@ export const columns: ColumnDef<Transaction>[] = [
         cell: ({ row }) => {
             const status = row.getValue("status") as string
             return (
-                <div className={`text-xs px-2 py-1 rounded-full inline-block ${status === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-400'
+                <div className={`text-xs px-2 py-1 rounded-full inline-block whitespace-nowrap ${status === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-400'
                     }`}>
                     {status}
                 </div>
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Transaction>[] = [
         cell: ({ row }) => {
             const recipient = row.original.recipientAddress
             if (!recipient) return <div className="text-zinc-600 text-xs">-</div>
-            return <ENSOrAddress address={recipient} />
+            return <div className="max-w-[120px] sm:max-w-[150px]"><ENSOrAddress address={recipient} /></div>
         }
     },
     {
@@ -76,7 +76,7 @@ export const columns: ColumnDef<Transaction>[] = [
                 currency: "USD",
             }).format(amount)
 
-            return <div className="text-right font-mono text-emerald-400 font-bold">+{formatted}</div>
+            return <div className="text-right font-mono text-emerald-400 font-bold whitespace-nowrap">+{formatted}</div>
         },
     },
     {
@@ -84,7 +84,13 @@ export const columns: ColumnDef<Transaction>[] = [
         header: "Transaction Hash",
         cell: ({ row }) => {
             const txHash = row.getValue("txHash") as string
-            return <div className="text-zinc-300 font-mono text-xs">{txHash}</div>
+            const shortHash = `${txHash.slice(0, 6)}...${txHash.slice(-4)}`
+            return (
+                <div className="text-zinc-300 font-mono text-xs" title={txHash}>
+                    <span className="hidden sm:inline">{shortHash}</span>
+                    <span className="sm:hidden">{txHash.slice(0, 8)}...</span>
+                </div>
+            )
         }
     }
 ]
