@@ -137,7 +137,7 @@ export function ZapWidget() {
     };
 
     return (
-        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden flex flex-col">
+        <Card className="w-full h-full bg-zinc-900 border-zinc-800 text-white relative overflow-hidden flex flex-col max-w-full">
             {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
 
             <CardHeader className="border-b border-zinc-800/50">
@@ -147,29 +147,29 @@ export function ZapWidget() {
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+            <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col justify-between p-4 sm:p-6">
                 {/* 1. Amount Field */}
-                <div className="flex-1 flex items-center gap-4 bg-zinc-950 p-4 rounded-xl border border-zinc-800 min-h-[100px]">
+                <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 bg-zinc-950 p-3 sm:p-4 rounded-xl border border-zinc-800 min-h-[140px] sm:min-h-[100px]">
                     <div className="flex-1">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Pay (Sepolia)</p>
-                        <div className="flex items-center gap-2">
+                        <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mb-1 sm:mb-2">Pay (Sepolia)</p>
+                        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                             <Input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="bg-transparent border-none text-3xl md:text-4xl p-0 h-auto focus-visible:ring-0 text-white font-bold font-mono tracking-tight tabular-nums"
+                                className="bg-transparent border-none text-2xl sm:text-3xl md:text-4xl p-0 h-auto focus-visible:ring-0 text-white font-bold font-mono tracking-tight tabular-nums min-w-0 overflow-hidden"
                             />
-                            <span className="font-bold text-zinc-400 text-lg md:text-xl mt-1">ETH</span>
+                            <span className="font-bold text-zinc-400 text-base sm:text-lg md:text-xl mt-0.5 sm:mt-1 whitespace-nowrap flex-shrink-0">ETH</span>
                         </div>
                     </div>
-                    <ArrowRight className="text-zinc-600 h-5 w-5" />
-                    <div className="flex-1 text-right">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Receive (Cross-Chain)</p>
-                        <div className="flex items-center justify-end gap-2">
-                            <span className="text-3xl md:text-4xl font-bold text-white font-mono tracking-tight tabular-nums">
+                    <ArrowRight className="text-zinc-600 h-4 w-4 sm:h-5 sm:w-5 self-center sm:self-auto rotate-90 sm:rotate-0" />
+                    <div className="flex-1 sm:text-right">
+                        <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mb-1 sm:mb-2">Receive (Cross-Chain)</p>
+                        <div className="flex items-center sm:justify-end gap-1.5 sm:gap-2 min-w-0">
+                            <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white font-mono tracking-tight tabular-nums truncate">
                                 ~{(Number(amount) * 2800).toFixed(2)}
                             </span>
-                            <span className="font-bold text-blue-400 text-lg md:text-xl mt-1">USDC</span>
+                            <span className="font-bold text-blue-400 text-base sm:text-lg md:text-xl mt-0.5 sm:mt-1 whitespace-nowrap flex-shrink-0">USDC</span>
                         </div>
                     </div>
                 </div>
@@ -178,32 +178,32 @@ export function ZapWidget() {
                 <div className="h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent"></div>
 
                 {/* CONTROLS container to match Flash Stream layout */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                     {/* 2. Recipient Field with ENS Support */}
-                    <div className="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
+                    <div className="bg-zinc-950 p-2.5 sm:p-3 rounded-lg border border-zinc-800">
+                        <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-widest mb-1 font-bold">
                             Recipient (Address or ENS)
                         </p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                             <Input
                                 value={recipientAddress}
                                 onChange={(e) => setRecipientAddress(e.target.value.trim())}
                                 placeholder="0x... or vitalik.eth"
-                                className="bg-transparent border-none text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1"
+                                className="bg-transparent border-none text-xs sm:text-sm p-0 h-auto focus-visible:ring-0 text-emerald-400 font-mono flex-1 min-w-0 truncate"
                             />
                             {isResolvingENS && (
-                                <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                                <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin text-blue-400 flex-shrink-0" />
                             )}
                             {isENS && !isResolvingENS && resolvedENSAddress && (
-                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 flex-shrink-0" />
                             )}
                             {isENS && !isResolvingENS && !resolvedENSAddress && recipientAddress && (
-                                <AlertCircle className="h-4 w-4 text-red-500" />
+                                <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500 flex-shrink-0" />
                             )}
                         </div>
                         {/* Show resolved address below ENS name */}
                         {isENS && resolvedENSAddress && (
-                            <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                            <p className="text-[9px] sm:text-[10px] text-zinc-600 mt-1 font-mono">
                                 → {resolvedENSAddress.slice(0, 6)}...{resolvedENSAddress.slice(-4)}
                             </p>
                         )}
@@ -212,11 +212,11 @@ export function ZapWidget() {
                     <Button
                         onClick={handleZap}
                         disabled={loading || !amount || Number(amount) <= 0}
-                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12"
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-11 sm:h-12 text-sm sm:text-base"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin" /> {status}
+                                <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" /> <span className="truncate">{status}</span>
                             </span>
                         ) : (
                             "Zap Money Instantly ⚡"
