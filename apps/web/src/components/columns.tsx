@@ -1,8 +1,9 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpRight, ArrowDownLeft } from "lucide-react"
+import { ArrowUpRight, ArrowDownLeft, Copy } from "lucide-react"
 import { ENSOrAddress } from "./ens-or-address"
+import { toast } from "sonner"
 
 // This type is used to define the shape of our data.
 export type Transaction = {
@@ -85,10 +86,27 @@ export const columns: ColumnDef<Transaction>[] = [
         cell: ({ row }) => {
             const txHash = row.getValue("txHash") as string
             const shortHash = `${txHash.slice(0, 6)}...${txHash.slice(-4)}`
+
+            const handleCopy = async () => {
+                try {
+                    await navigator.clipboard.writeText(txHash)
+                    toast.success("Transaction hash copied!", {
+                        description: `${txHash.slice(0, 10)}...${txHash.slice(-8)}`
+                    })
+                } catch (err) {
+                    toast.error("Failed to copy to clipboard")
+                }
+            }
+
             return (
-                <div className="text-zinc-300 font-mono text-xs" title={txHash}>
+                <div
+                    className="text-zinc-300 font-mono text-xs cursor-pointer hover:text-emerald-400 transition-colors group relative flex items-center gap-1.5"
+                    onClick={handleCopy}
+                    title={`${txHash}`}
+                >
                     <span className="hidden sm:inline">{shortHash}</span>
                     <span className="sm:hidden">{txHash.slice(0, 8)}...</span>
+                    <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 </div>
             )
         }
