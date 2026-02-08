@@ -152,7 +152,7 @@ export function FlashStreamWidget() {
                         Real-Time Value
                     </span>
                     <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tabular-nums tracking-tight z-10 truncate max-w-full px-2">
-                        ${streamedAmount.toFixed(6)}
+                        <span className="font-bold text-zinc-400 text-base sm:text-lg md:text-xl mt-0.5 sm:mt-1 whitespace-nowrap flex-shrink-0">ETH</span> {streamedAmount.toFixed(6)}
                     </div>
                     <div className="flex items-center gap-1.5 sm:gap-2 mt-1 text-[10px] sm:text-xs text-emerald-400 z-10 h-5">
                         {isStreaming ? (
